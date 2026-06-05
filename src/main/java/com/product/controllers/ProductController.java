@@ -56,15 +56,19 @@ public class ProductController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse> deleteProductByIdController(Long id) {
-		productService.deleteProductByIdService(id);
-		ApiResponse apiResponse=ApiResponse.builder()
-				.serviceName("PRODUCT_SERVICE")
-				.status(true)
-				.type("string")
-				.payload("Product deleted")
-				.build();
-		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.OK);
+	public ResponseEntity<ApiResponse> deleteProductByIdController(
+	        @PathVariable("id") Long id) {
+
+	    productService.deleteProductByIdService(id);
+
+	    ApiResponse apiResponse = ApiResponse.builder()
+	            .serviceName("PRODUCT_SERVICE")
+	            .status(true)
+	            .type("string")
+	            .payload("Product deleted successfully")
+	            .build();
+
+	    return ResponseEntity.ok(apiResponse);
 	}
 	
 	@PutMapping("/{id}")
@@ -80,16 +84,20 @@ public class ProductController {
 	}
 	
 	@GetMapping("/catagory")
-	public ResponseEntity<ApiResponse> getProductByCatagories(@RequestParam(name="catagory", required = false, defaultValue = "FMCG") String catagory, @RequestParam(name = "sorting",required = false, defaultValue = "ASC") String sorting) 
-	{
-		List<Product> products =productService.getProductsByCatagory(catagory,sorting);
-		List<ProductResponseDto> dtos= products.stream()
-				.map(p->modelMapper.entityToProductResponseDtoMapper(p)).toList(); 
-		ApiResponse apiResponse=ApiResponse.builder().serviceName("PRODUCT_SERVICE")
-				.status(true)
-				.type("object array")
-				.payload(dtos).build();
-		return ResponseEntity.ok(apiResponse); 
+	public ResponseEntity<?> getByCategory(
+	        @RequestParam String catagory,
+	        @RequestParam(defaultValue = "0") Integer pageNo,
+	        @RequestParam(defaultValue = "5") Integer pageSize
+	){
+
+	    List<Product> products =
+	            productService.getProductsByCategoryPage(
+	                    catagory,
+	                    pageNo,
+	                    pageSize
+	            );
+
+	    return ResponseEntity.ok(products);
 	}
 	
 	@GetMapping("/page")
@@ -120,5 +128,28 @@ public class ProductController {
 		String serviceResponse=productService.decProductStock(id, stockAmount);
 		ApiResponse apiResponse=new ApiResponse("PRODUCT_SERVICE",true,"string",serviceResponse);
 		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/search")
+	public ResponseEntity<ApiResponse> searchProducts(
+	        @RequestParam String keyword){
+
+	    List<Product> products =
+	            productService.searchProductByName(keyword);
+
+	    List<ProductResponseDto> dtos =
+	            products.stream()
+	            .map(modelMapper::entityToProductResponseDtoMapper)
+	            .toList();
+
+	    ApiResponse response = ApiResponse.builder()
+	            .serviceName("PRODUCT_SERVICE")
+	            .status(true)
+	            .type("object array")
+	            .payload(dtos)
+	            .build();
+
+	    return ResponseEntity.ok(response);
 	}
 } 

@@ -27,6 +27,7 @@ public class Product {
 	
 	private String name;
 	private String description;
+	private String imageUrl;
 	private String brand;
 	private String catagory;
 	private Integer stock;
@@ -36,4 +37,6 @@ public class Product {
 	
 	private LocalDateTime createdAt;
 	private LocalDateTime updateAt;
+	
+	
 }

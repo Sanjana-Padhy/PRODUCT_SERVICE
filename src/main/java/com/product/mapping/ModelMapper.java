@@ -14,43 +14,52 @@ import com.product.entity.User;
 
 @Component
 public class ModelMapper {
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	public Product getProductFromAddProductDtoMapper(AddProductDto dto) {
-		Product product=Product.builder()
-				.name(dto.getName())
-				.description(dto.getDescription())
-				.brand(dto.getBrand())
-				.catagory(dto.getCatagory())
-				.stock(dto.getStock())
-				.price(dto.getPrice())
-				.isActive(true)
-				.createdAt(LocalDateTime.now())
-				.updateAt(LocalDateTime.now()).build();
-		return product;
-	}
-	
-	public ProductResponseDto entityToProductResponseDtoMapper(Product product) {
-		return ProductResponseDto.builder()
-				.name(product.getName())
-				.brand(product.getBrand())
-				.description(product.getDescription())
-				.catagory(product.getCatagory())
-				.price(product.getPrice())
-				.build(); 
-	}
-	
-	public User addUserDtoToUserEntity(AddUserDto dto) {
-		User user=User.builder()
-				.name(dto.getName())
-				.email(dto.getEmail())
-				.password(passwordEncoder.encode(dto.getPassword()))
-				.role(dto.getRole())
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now()).build();
-		return user; 
-	}
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public Product getProductFromAddProductDtoMapper(AddProductDto dto) {
+
+        Product product = Product.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .brand(dto.getBrand())
+                .catagory(dto.getCatagory())
+                .stock(dto.getStock())
+                .price(dto.getPrice())
+                .imageUrl(dto.getImageUrl())
+                .isActive(true)
+                .createdAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .build();
+
+        return product;
+    }
+
+    public ProductResponseDto entityToProductResponseDtoMapper(Product product) {
+
+        return ProductResponseDto.builder()
+                .pid(product.getPid())
+                .name(product.getName())
+                .description(product.getDescription())
+                .imageUrl(product.getImageUrl())
+                .brand(product.getBrand())
+                .catagory(product.getCatagory())
+                .price(product.getPrice())
+                .build();
+    }
+
+    public User addUserDtoToUserEntity(AddUserDto dto) {
+
+        User user = User.builder()
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .role(dto.getRole())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        return user;
+    }
 }

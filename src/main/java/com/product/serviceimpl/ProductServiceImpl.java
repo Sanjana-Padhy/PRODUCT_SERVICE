@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
-	@Cacheable(value = "product",key="#id")
+	// @Cacheable(value = "product",key="#id")
 	public Product getProductByIdService(Long id) {
 		Optional<Product> optProduct=productRepo.findById(id);
 		if(optProduct.isEmpty()) {
@@ -71,6 +71,7 @@ public class ProductServiceImpl implements ProductService{
 		product.setDescription(dto.getDescription());
 		product.setPrice(dto.getPrice());
 		product.setCatagory(dto.getCatagory());
+		product.setImageUrl(dto.getImageUrl());
 		product.setStock(dto.getStock());
 		product.setUpdateAt(LocalDateTime.now());
 		product=productRepo.save(product);
@@ -88,6 +89,31 @@ public class ProductServiceImpl implements ProductService{
 		products=products.stream().filter(i->i.getIsActive()).sorted(comparator).toList();
 		return 	products;
 	}
+	
+	@Override
+	public List<Product> getProductsByCategoryPage(
+	        String category,
+	        Integer pageNo,
+	        Integer pageSize
+	) {
+
+	    category = category.toUpperCase();
+
+	    Pageable pageable =
+	        PageRequest.of(
+	            pageNo,
+	            pageSize,
+	            Sort.by("pid").descending()
+	        );
+
+	    Page<Product> page =
+	        productRepo.findByCatagoryAndIsActiveTrue(
+	            category,
+	            pageable
+	        );
+
+	    return page.getContent();
+	}
 
 	@Override
 	public List<Product> getProductByPageService(Integer pageNo, Integer pageSize, String sorting) {
@@ -102,7 +128,9 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
-	public List<Product> getProductByPageService(Integer pageNo, Integer pageSize) {
+	public List<Product> getProductByPageService(
+	        Integer pageNo,
+	        Integer pageSize) {
 
 	    Pageable pageable =
 	            PageRequest.of(
@@ -111,11 +139,12 @@ public class ProductServiceImpl implements ProductService{
 	                    Sort.by("pid").descending()
 	            );
 
-	    Page<Product> page = productRepo.findAll(pageable);
+	    Page<Product> page =
+	            productRepo.findByIsActiveTrue(pageable);
 
 	    return page.getContent();
 	}
-
+ 
 	@Override
 	@Transactional
 	public String incProductStock(Long id, int stockAmount) {
@@ -135,6 +164,14 @@ public class ProductServiceImpl implements ProductService{
 		product.setStock(product.getStock()-stockAmount);
 		product= productRepo.save(product);
 		return "new inventory stock is "+product.getStock(); 
+	}
+	
+	
+	@Override
+	public List<Product> searchProductByName(String name) {
+
+	    return productRepo
+	            .findByNameContainingIgnoreCaseAndIsActiveTrue(name);
 	}
 
 }

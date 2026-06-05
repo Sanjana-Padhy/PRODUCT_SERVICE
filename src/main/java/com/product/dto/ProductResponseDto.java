@@ -14,8 +14,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class ProductResponseDto {
+	
+	private Long pid;
+	
 	private String name;
 	private String description;
+	
+	private String imageUrl;
+	
 	private String brand;
 	private String catagory;
 	private BigDecimal price;

@@ -23,4 +23,14 @@ public interface ProductService {
 	public String incProductStock(Long id, int stockAmount);
 	public String decProductStock(Long id, int stockAmount); 
 
+	
+	List<Product> searchProductByName(String name);
+	
+	List<Product> getProductsByCategoryPage(
+	        String category,
+	        Integer pageNo,
+	        Integer pageSize
+	);
+	
+	
 }

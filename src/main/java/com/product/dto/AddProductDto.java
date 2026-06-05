@@ -32,6 +32,8 @@ public class AddProductDto {
 	@PositiveOrZero(message = "product stock can't be zero")
 	private Integer stock;
 	
+	private String imageUrl;
+	
 	@PositiveOrZero(message = "product price can't be in minus")
 	private BigDecimal price;
 }
