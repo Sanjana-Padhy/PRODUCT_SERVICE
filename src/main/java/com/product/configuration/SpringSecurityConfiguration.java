@@ -62,18 +62,22 @@ public class SpringSecurityConfiguration {
             .cors(cors -> {})
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/", "/index.html",
-                    "/login.html",
-                    "/register.html",
-                    "/otp.html",
-                    "/products.html",
-                    "/style.css",
-                    "/script.js",
-                    "/favicon.ico",
-                    "/api/v3/auth/**",
-                    "/api/v2/user/**"
-                ).permitAll()
+            		.requestMatchers(
+            			    "/",
+            			    "/index.html",
+            			    "/login.html",
+            			    "/register.html",
+            			    "/otp.html",
+            			    "/products.html",
+            			    "/style.css",
+            			    "/script.js",
+            			    "/favicon.ico",
+
+            			    "/uploads/**",
+
+            			    "/api/v3/auth/**",
+            			    "/api/v2/user/**"
+            			).permitAll()
                 .anyRequest().authenticated()
             )
 
