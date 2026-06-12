@@ -2,6 +2,10 @@ package com.product.controllers;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import org.springframework.security.core.Authentication;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,15 +37,33 @@ public class ProductController {
 	
 	private final ModelMapper modelMapper;
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
-	public ResponseEntity<ApiResponse> addNewProductController(@Valid @RequestBody AddProductDto dto) {
-		String serviceResponse=productService.addNewProductServiceString(dto);
-		ApiResponse apiresponse=ApiResponse.builder().serviceName("PRODUCT_SERVICE")
-				.status(true)
-				.type("String").payload(serviceResponse).build();
-		return new ResponseEntity<ApiResponse>(apiresponse,HttpStatus.OK); 
+	public ResponseEntity<ApiResponse> addNewProductController(
+	        @Valid @RequestBody AddProductDto dto,
+	        Authentication authentication) {
+
+	    System.out.println("Logged User = "
+	            + authentication.getName());
+
+	    System.out.println("Authorities = "
+	            + authentication.getAuthorities());
+
+	    String serviceResponse =
+	            productService.addNewProductServiceString(dto);
+
+	    ApiResponse apiresponse =
+	            ApiResponse.builder()
+	                    .serviceName("PRODUCT_SERVICE")
+	                    .status(true)
+	                    .type("String")
+	                    .payload(serviceResponse)
+	                    .build();
+
+	    return new ResponseEntity<>(apiresponse, HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@GetMapping("/{id}")
 	public  ResponseEntity<ApiResponse> getProductByIdController(@PathVariable("id") Long id) {
 		Product product=productService.getProductByIdService(id);
@@ -55,6 +77,7 @@ public class ProductController {
 		return new ResponseEntity<ApiResponse>(apiresponse,HttpStatus.OK);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponse> deleteProductByIdController(
 	        @PathVariable("id") Long id) {
@@ -71,6 +94,7 @@ public class ProductController {
 	    return ResponseEntity.ok(apiResponse);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponse> updateProductByIdController(@PathVariable("id") Long id, @RequestBody AddProductDto dto) {
 		Product product=productService.updateProductByIdService(id, dto);
@@ -83,6 +107,7 @@ public class ProductController {
 		return ResponseEntity.ok(apiresponse);
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@GetMapping("/catagory")
 	public ResponseEntity<?> getByCategory(
 	        @RequestParam String catagory,
@@ -100,6 +125,7 @@ public class ProductController {
 	    return ResponseEntity.ok(products);
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@GetMapping("/page")
 	public ResponseEntity<ApiResponse> getProductByPage(@RequestParam(name ="pageNo", required = false, defaultValue = "0") Integer pageNo, @RequestParam(name = "pageSize",
 			required = false,
@@ -116,6 +142,7 @@ public class ProductController {
 		return ResponseEntity.ok(apiResponse);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/stock/inc/{id}/{amount}")
 	public ResponseEntity<ApiResponse> incStocksController(@PathVariable("id") Long id,@PathVariable("amount") Integer stockAmount) {
 		String serviceResponse=productService.incProductStock(id, stockAmount);
@@ -123,6 +150,7 @@ public class ProductController {
 		return ResponseEntity.ok(apiResponse);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/stock/dec/{id}/{amount}")
 	public ResponseEntity<ApiResponse> decStocksController(@PathVariable("id") Long id,@PathVariable("amount") Integer stockAmount) {
 		String serviceResponse=productService.decProductStock(id, stockAmount);
@@ -130,7 +158,7 @@ public class ProductController {
 		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.OK);
 	}
 	
-	
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@GetMapping("/search")
 	public ResponseEntity<ApiResponse> searchProducts(
 	        @RequestParam String keyword){
@@ -152,4 +180,6 @@ public class ProductController {
 
 	    return ResponseEntity.ok(response);
 	}
+	
+	
 } 

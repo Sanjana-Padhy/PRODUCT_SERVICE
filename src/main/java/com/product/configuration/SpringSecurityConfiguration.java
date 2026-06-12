@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.product.filters.JWTFilter;
 
+@EnableMethodSecurity
 @Configuration
 public class SpringSecurityConfiguration {
 
@@ -76,7 +78,11 @@ public class SpringSecurityConfiguration {
             			    "/uploads/**",
 
             			    "/api/v3/auth/**",
-            			    "/api/v2/user/**"
+            			    "/api/v2/user/**",
+            			    "/profile.html",
+            			    "/profile.js",
+            			    "/change-password.html",
+            			    "/change-password.js"
             			).permitAll()
                 .anyRequest().authenticated()
             )

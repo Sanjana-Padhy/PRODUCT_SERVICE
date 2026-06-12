@@ -11,7 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.product.dto.AddUserDto;
+import com.product.dto.ChangePasswordDto;
 import com.product.dto.EmailOtpVerifyDto;
+import com.product.dto.ForgotPasswordDto;
+import com.product.dto.ResetPasswordDto;
+import com.product.dto.VerifyResetOtpDto;
 import com.product.entity.User;
 import com.product.events.SimpleMessageEvent;
 import com.product.mapping.ModelMapper;
@@ -144,4 +148,133 @@ public class UserServiceImpl implements UserService {
 
         return "User registered successfully";
     }
+
+    @Override
+    public String changePassword(
+            String email,
+            ChangePasswordDto dto) {
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(
+                dto.getOldPassword(),
+                user.getPassword())) {
+
+            throw new RuntimeException(
+                    "Old password is incorrect");
+        }
+
+        if (!dto.getNewPassword()
+                .equals(dto.getConfirmPassword())) {
+
+            throw new RuntimeException(
+                    "Passwords do not match");
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        dto.getNewPassword()));
+
+        userRepo.save(user);
+
+        return "Password changed successfully";
+    }
+
+   
+
+    @Override
+    public String forgotPasswordService(
+            ForgotPasswordDto dto) {
+
+        User user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found"));
+
+        Integer otp =
+                random.nextInt(100000, 999999);
+
+        String message =
+                "Your Password Reset OTP is : " + otp;
+
+        SimpleMessageEvent event =
+                SimpleMessageEvent.builder()
+                        .receiverEmail(dto.getEmail())
+                        .subject("Password Reset OTP")
+                        .message(message)
+                        .build();
+
+        eventPublisher.publishEvent(event);
+
+        Object[] otpData = {
+                otp + "",
+                LocalDateTime.now().plusMinutes(2)
+        };
+
+        otpholder.put(dto.getEmail(), otpData);
+
+        return "OTP sent successfully";
+    }
+
+    @Override
+    public String verifyResetOtpService(
+            VerifyResetOtpDto dto) {
+
+        Object[] otpData =
+                otpholder.get(dto.getEmail());
+
+        if (otpData == null) {
+            throw new RuntimeException(
+                    "OTP expired");
+        }
+
+        LocalDateTime expiry =
+                (LocalDateTime) otpData[1];
+
+        if (LocalDateTime.now().isAfter(expiry)) {
+
+            otpholder.remove(dto.getEmail());
+
+            throw new RuntimeException(
+                    "OTP expired");
+        }
+
+        String savedOtp =
+                (String) otpData[0];
+
+        if (!savedOtp.equals(dto.getOtp())) {
+
+            throw new RuntimeException(
+                    "Invalid OTP");
+        }
+
+        return "OTP verified successfully";
+    }
+
+    @Override
+    public String resetPasswordService(
+            ResetPasswordDto dto) {
+
+        User user =
+                userRepo.findByEmail(dto.getEmail())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"));
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        dto.getNewPassword()));
+
+        userRepo.save(user);
+
+        otpholder.remove(dto.getEmail());
+
+        return "Password reset successful";
+    }
 }
+
+
+    
+    
