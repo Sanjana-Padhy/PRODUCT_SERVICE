@@ -25,4 +25,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 	        Pageable pageable
 	);
 	
+	  // Dashboard
+	long countByIsActiveTrue();
+
+	long countByStockGreaterThanAndIsActiveTrue(int stock);
+
+	long countByStockEqualsAndIsActiveTrue(int stock);
+	
 }

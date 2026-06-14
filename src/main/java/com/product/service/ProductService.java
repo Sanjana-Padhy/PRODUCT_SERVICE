@@ -5,6 +5,8 @@ import java.util.List;
 import com.product.dto.AddProductDto;
 import com.product.entity.Product;
 
+import com.product.dto.DashboardDto;
+
 public interface ProductService {
 	
 	public String addNewProductServiceString(AddProductDto dto); 
@@ -31,6 +33,8 @@ public interface ProductService {
 	        Integer pageNo,
 	        Integer pageSize
 	);
+	
+	DashboardDto getDashboardData();
 	
 	
 }

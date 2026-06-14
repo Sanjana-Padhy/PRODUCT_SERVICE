@@ -22,11 +22,16 @@ import com.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import com.product.dto.DashboardDto;
+import com.product.repository.UserRepository;
+
 @Service
 @RequiredArgsConstructor 
 public class ProductServiceImpl implements ProductService{
 	
 	private final ProductRepository productRepo;
+	
+	private final UserRepository userRepo;
 	
 	private final ModelMapper modelmapper;
 
@@ -174,4 +179,26 @@ public class ProductServiceImpl implements ProductService{
 	            .findByNameContainingIgnoreCaseAndIsActiveTrue(name);
 	}
 
+	@Override
+	public DashboardDto getDashboardData() {
+
+	    long totalProducts =
+	            productRepo.countByIsActiveTrue();
+
+	    long totalUsers =
+	            userRepo.count();
+
+	    long inStockProducts =
+	            productRepo.countByStockGreaterThanAndIsActiveTrue(0);
+
+	    long outOfStockProducts =
+	            productRepo.countByStockEqualsAndIsActiveTrue(0);
+
+	    return DashboardDto.builder()
+	            .totalProducts(totalProducts)
+	            .totalUsers(totalUsers)
+	            .inStockProducts(inStockProducts)
+	            .outOfStockProducts(outOfStockProducts)
+	            .build();
+	}
 }
