@@ -15,13 +15,28 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse>
-		handleDtoValidationException(MethodArgumentNotValidException ex) {
-		String message=ex.getBindingResult().getFieldErrors().stream()
-				.map(error->error.getDefaultMessage()).findFirst().orElse("Validation error");
-		ApiResponse apiResponse = ApiResponse.builder()
-				.serviceName("PRODUCT_SERVICE")
-				.status(false).type("string").payload(ex.getMessage()).build();
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	handleDtoValidationException(MethodArgumentNotValidException ex) {
+
+	    String message =
+	            ex.getBindingResult()
+	              .getFieldErrors()
+	              .stream()
+	              .map(error -> error.getDefaultMessage())
+	              .findFirst()
+	              .orElse("Validation error");
+
+	    ApiResponse apiResponse =
+	            ApiResponse.builder()
+	                    .serviceName("PRODUCT_SERVICE")
+	                    .status(false)
+	                    .type("string")
+	                    .payload(message)
+	                    .build();
+
+	    return new ResponseEntity<>(
+	            apiResponse,
+	            HttpStatus.BAD_REQUEST
+	    );
 	}
 
 
@@ -41,5 +56,5 @@ public ResponseEntity<ApiResponse> noSuchElementExceptionHandler(NoSuchElementEx
 	return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 }
 	
-}  
+}   
 
